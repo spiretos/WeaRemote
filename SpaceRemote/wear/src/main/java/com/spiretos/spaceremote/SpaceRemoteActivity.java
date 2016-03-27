@@ -10,6 +10,9 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.spiretos.wearemote.communication.Communicator;
+import com.spiretos.wearemote.utils.DataUtils;
+
 public class SpaceRemoteActivity extends WearableActivity implements SensorEventListener
 {
 
@@ -18,6 +21,7 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
 
     private TextView mSensorText;
 
+    Communicator mCommunicator;
 
 
     @Override
@@ -27,10 +31,13 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
         setContentView(R.layout.activity_space_remote);
         setAmbientEnabled();
 
-        mSensorText=(TextView)findViewById(R.id.main_sensortext);
+        mSensorText = (TextView) findViewById(R.id.main_sensortext);
 
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+
+        mCommunicator = new Communicator(this);
+        mCommunicator.connect();
     }
 
     @Override
@@ -82,19 +89,19 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
     @Override
     protected void onStop()
     {
-        super.onStop();
-
         if (mSensorManager != null)
         {
             Log.v("wear", "sensor UN-Registered");
             mSensorManager.unregisterListener(this);
         }
+
+        super.onStop();
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent)
     {
-        if (mSensorText!=null)
+        if (mSensorText != null)
         {
             StringBuilder sb = new StringBuilder();
             sb.append("x:" + sensorEvent.values[0] + "\n");
@@ -102,6 +109,9 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
             sb.append("z:" + sensorEvent.values[2]);
 
             mSensorText.setText(sb.toString());
+
+            if (mCommunicator != null)
+                mCommunicator.sendMessage("gyroscope_data_y", DataUtils.getByteArray(String.valueOf(sensorEvent.values[1])));
         }
     }
 

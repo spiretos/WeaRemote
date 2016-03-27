@@ -28,7 +28,7 @@ public class AppListenerService extends WearableListenerService
             startActivity(intent);
 
             Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            long[] vibrationPattern = {0, 50, 75, 50};
+            long[] vibrationPattern = {0, 75, 50, 75};
             vibrator.vibrate(vibrationPattern, -1);
         }
     }

@@ -1,27 +1,27 @@
 package com.spiretos.spaceremote.game;
 
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.wearable.MessageApi;
-import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.NodeApi;
-import com.google.android.gms.wearable.Wearable;
 import com.spiretos.spaceremote.R;
+import com.spiretos.spaceremote.communication.AppListenerService;
+import com.spiretos.spaceremote.communication.GameDataReceiver;
+import com.spiretos.wearemote.communication.Communicator;
 
-public class GameActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+public class GameActivity extends AppCompatActivity implements GameDataReceiver.GameDataListener
 {
 
     public static final String START_ACTIVITY_PATH = "/start/MainActivity";
 
+    TextView mDataText;
 
-    private GoogleApiClient mGoogleApiClient;
+    Communicator mCommunicator;
+    //ActivityMessageHandler mHandler;
+    GameDataReceiver mReceiver;
+
 
 
     @Override
@@ -30,66 +30,56 @@ public class GameActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        Log.v("app","create");
+        //Log.v("app", "create");
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(Wearable.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-        mGoogleApiClient.connect();
-    }
+        mDataText = (TextView) findViewById(R.id.game_datatext);
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle)
-    {
-        Log.v("app","onConnected");
-
-        Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>()
+        mCommunicator = new Communicator(this);
+        mCommunicator.setCommunicationListener(new Communicator.CommunicationListener()
         {
             @Override
-            public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult)
+            public void onConnected()
             {
-                Log.v("app","getConnectedNodes: "+getConnectedNodesResult.getNodes().size());
-
-                for (Node node : getConnectedNodesResult.getNodes())
-                {
-                    sendMessage(node.getId());
-                }
+                mCommunicator.sendMessage(START_ACTIVITY_PATH);
             }
         });
+        mCommunicator.connect();
+    }
+
+
+    @Override
+    protected void onStart()
+    {
+        super.onStart();
+
+        mReceiver = new GameDataReceiver();
+        mReceiver.setGameDataListener(this);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AppListenerService.RECEIVED_Y_DATA);
+        registerReceiver(mReceiver, intentFilter);
     }
 
     @Override
-    public void onConnectionSuspended(int i)
+    protected void onStop()
     {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult)
-    {
-
-    }
-
-
-    private void sendMessage(String node)
-    {
-        Log.v("app","sendMessage");
-
-        Wearable.MessageApi.sendMessage(mGoogleApiClient, node, START_ACTIVITY_PATH, new byte[0]).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>()
+        if (mReceiver != null)
         {
-            @Override
-            public void onResult(MessageApi.SendMessageResult sendMessageResult)
-            {
-                Log.v("app","onResult");
+            mReceiver.removeGameDataListener(this);
+            unregisterReceiver(mReceiver);
+        }
 
-                if (!sendMessageResult.getStatus().isSuccess())
-                {
-                    Log.e("GoogleApi", "Failed to send message with status code: "
-                            + sendMessageResult.getStatus().getStatusCode());
-                }
-            }
-        });
+        super.onStop();
     }
+
+
+    @Override
+    public void onYchanged(float yValue)
+    {
+        Log.v("data2", yValue + "");
+
+        if (mDataText!=null)
+            mDataText.setText(String.valueOf(yValue));
+    }
+
 }
