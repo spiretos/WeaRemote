@@ -17,13 +17,14 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button startButton=(Button) findViewById(R.id.main_startbutton);
-        startButton.setOnClickListener(new View.OnClickListener()
+        Button spaceRemoteButton=(Button) findViewById(R.id.main_spaceremote_button);
+        spaceRemoteButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
                 Intent gameIntent=new Intent(MainActivity.this, GameActivity.class);
+                gameIntent.putExtra("game",GameActivity.GAME_SPACE);
                 startActivity(gameIntent);
             }
         });

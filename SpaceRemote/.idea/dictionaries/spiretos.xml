@@ -2,6 +2,7 @@
   <dictionary name="spiretos">
     <words>
       <w>datatext</w>
+      <w>gameloop</w>
       <w>sensortext</w>
       <w>spaceremote</w>
       <w>startbutton</w>

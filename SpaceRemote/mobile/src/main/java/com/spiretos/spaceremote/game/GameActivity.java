@@ -4,11 +4,15 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 
 import com.spiretos.spaceremote.R;
 import com.spiretos.spaceremote.communication.AppListenerService;
 import com.spiretos.spaceremote.communication.GameDataReceiver;
+import com.spiretos.spaceremote.game.canvas.BasicSurfaceCallback;
+import com.spiretos.spaceremote.game.canvas.GameLoopThread;
 import com.spiretos.wearemote.communication.Communicator;
 
 public class GameActivity extends AppCompatActivity implements GameDataReceiver.GameDataListener
@@ -16,12 +20,17 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
 
     public static final String START_ACTIVITY_PATH = "/start/MainActivity";
 
+    public static final String GAME_SPACE = "game_space";
+    public static final String GAME_GHOSTS = "game_ghosts";
+
+
     TextView mDataText;
 
     Communicator mCommunicator;
-    //ActivityMessageHandler mHandler;
     GameDataReceiver mReceiver;
-
+    SurfaceView mSurface;
+    SpaceRemoteGameEngine mGameEngine;
+    GameLoopThread mGameLoop;
 
 
     @Override
@@ -31,6 +40,7 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         setContentView(R.layout.activity_game);
 
         //Log.v("app", "create");
+        setupGame();
 
         mDataText = (TextView) findViewById(R.id.game_datatext);
 
@@ -44,6 +54,21 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
             }
         });
         mCommunicator.connect();
+    }
+
+    private void setupGame()
+    {
+        mSurface = (SurfaceView) findViewById(R.id.game_surface);
+
+        SurfaceHolder mSurfaceHolder = mSurface.getHolder();
+
+        String game = getIntent().getStringExtra("game");
+        if (game.equals(GAME_SPACE))
+        {
+            mGameEngine = new SpaceRemoteGameEngine();
+            mGameLoop = new GameLoopThread(mSurfaceHolder, mGameEngine);
+            mSurfaceHolder.addCallback(new BasicSurfaceCallback(mGameLoop));
+        }
     }
 
 
@@ -69,6 +94,9 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
             unregisterReceiver(mReceiver);
         }
 
+        if (mGameLoop != null)
+            mGameLoop.setRunning(false);
+
         super.onStop();
     }
 
@@ -78,8 +106,11 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
     {
         Log.v("data2", yValue + "");
 
-        if (mDataText!=null)
+        if (mDataText != null)
             mDataText.setText(String.valueOf(yValue));
+
+        if (mGameEngine != null)
+            mGameEngine.setY(yValue);
     }
 
 }
