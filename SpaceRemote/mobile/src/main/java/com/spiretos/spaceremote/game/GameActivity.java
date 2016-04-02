@@ -86,7 +86,7 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
     }
 
     @Override
-    protected void onStop()
+    protected void onPause()
     {
         if (mReceiver != null)
         {
@@ -97,6 +97,12 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         if (mGameLoop != null)
             mGameLoop.setRunning(false);
 
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop()
+    {
         super.onStop();
     }
 
