@@ -110,13 +110,13 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
     @Override
     public void onYchanged(float yValue)
     {
-        Log.v("data2", yValue + "");
+        //Log.v("data2", yValue + "");
 
         if (mDataText != null)
             mDataText.setText(String.valueOf(yValue));
 
         if (mGameEngine != null)
-            mGameEngine.setY(yValue);
+            mGameEngine.setShipPosition(yValue);
     }
 
 }

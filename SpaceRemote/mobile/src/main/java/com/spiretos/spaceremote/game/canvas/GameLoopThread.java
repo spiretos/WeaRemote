@@ -35,9 +35,9 @@ public class GameLoopThread extends Thread
     {
         while (mIsRunning)
         {
-            mEngine.update();
-
             Canvas canvas = mHolder.lockCanvas(null);
+
+            mEngine.update(canvas);
 
             if (canvas != null)
             {
@@ -50,7 +50,7 @@ public class GameLoopThread extends Thread
 
             try
             {
-                Thread.sleep(10);
+                Thread.sleep(5);
             }
             catch (InterruptedException ex)
             {

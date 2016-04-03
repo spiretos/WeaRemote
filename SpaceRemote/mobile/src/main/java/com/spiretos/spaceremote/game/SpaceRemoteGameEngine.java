@@ -5,6 +5,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.spiretos.spaceremote.game.canvas.BasicGameEngine;
+import com.spiretos.spaceremote.game.items.Obstacle;
+
+import java.util.ArrayList;
 
 /**
  * Created by spiretos on 29/3/2016.
@@ -12,10 +15,20 @@ import com.spiretos.spaceremote.game.canvas.BasicGameEngine;
 public class SpaceRemoteGameEngine implements BasicGameEngine
 {
 
-    private float y;
+    private float shipPosition;
 
     Paint backPaint;
     Paint shipPaint;
+
+    ArrayList<Obstacle> mObstacles;
+
+    int spawnObstacleInterval = 800;
+    long lastObstacleTime = System.currentTimeMillis();
+
+
+    Obstacle obstacle;
+    float obstacleDistance;
+
 
 
 
@@ -26,14 +39,30 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
 
         shipPaint = new Paint();
         shipPaint.setColor(Color.YELLOW);
+
+        mObstacles = new ArrayList<>();
     }
 
 
 
     @Override
-    public void update()
+    public void update(Canvas canvas)
     {
+        long currentTime = System.currentTimeMillis();
 
+        for (int i = mObstacles.size() - 1; i >= 0; i--)
+        {
+            obstacle = mObstacles.get(i);
+            if (!obstacle.isActive())
+                mObstacles.remove(i);
+        }
+
+        if (currentTime - lastObstacleTime > spawnObstacleInterval)
+        {
+            obstacle = new Obstacle(canvas.getWidth());
+            mObstacles.add(obstacle);
+            lastObstacleTime = currentTime;
+        }
     }
 
     @Override
@@ -41,13 +70,24 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
     {
         canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), backPaint);
 
-        float x = canvas.getWidth() / 2f + y * 1000f;
+        for (int i = 0; i < mObstacles.size(); i++)
+        {
+            obstacle = mObstacles.get(i);
+            if (obstacle.isActive())
+            {
+                canvas.drawCircle(obstacle.getPosition(), obstacle.getDistance(), obstacle.getSize(), shipPaint);
+                if (obstacleDistance > canvas.getWidth() + 100)
+                    obstacle.setActive(false);
+            }
+        }
+
+        float x = canvas.getWidth() / 2f + shipPosition * 1000f;
         canvas.drawCircle(x, canvas.getHeight() - 50f, 10f, shipPaint);
     }
 
-    public void setY(float y)
+    public void setShipPosition(float y)
     {
-        this.y = y;
+        this.shipPosition = y;
     }
 
 }

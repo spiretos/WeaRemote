@@ -8,7 +8,7 @@ import android.graphics.Canvas;
 public interface BasicGameEngine
 {
 
-    void update();
+    void update(Canvas canvas);
     void Draw(Canvas canvas);
 
 }
