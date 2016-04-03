@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         String game = getIntent().getStringExtra("game");
         if (game.equals(GAME_SPACE))
         {
-            mGameEngine = new SpaceRemoteGameEngine();
+            mGameEngine = new SpaceRemoteGameEngine(this);
             mGameLoop = new GameLoopThread(mSurfaceHolder, mGameEngine);
             mSurfaceHolder.addCallback(new BasicSurfaceCallback(mGameLoop));
         }

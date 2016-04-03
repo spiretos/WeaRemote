@@ -1,5 +1,7 @@
 package com.spiretos.spaceremote.game.items;
 
+import android.graphics.RectF;
+
 import java.util.Random;
 
 /**
@@ -8,7 +10,7 @@ import java.util.Random;
 public class Obstacle
 {
 
-    int margin;
+    int margin = 50;
     int position;
 
     boolean active;
@@ -18,13 +20,14 @@ public class Obstacle
 
     float size;
 
+
     public Obstacle(int spaceWidth)
     {
         creationTime = System.currentTimeMillis();
 
         active = true;
         position = new Random().nextInt(spaceWidth - 2 * margin) + margin;
-        size = new Random().nextFloat() * 30f + 20;
+        size = new Random().nextFloat() * 50f + 50f;
     }
 
 
@@ -55,4 +58,8 @@ public class Obstacle
         return size;
     }
 
+    public RectF getRect(float obstacleDistance)
+    {
+        return new RectF((float) position - size / 2f, obstacleDistance - size / 2f, (float) position + size / 2f, obstacleDistance + size / 2f);
+    }
 }
