@@ -8,12 +8,17 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.wearable.Channel;
+import com.google.android.gms.wearable.ChannelApi;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,10 @@ public class Communicator implements GoogleApiClient.ConnectionCallbacks, Google
     Context mContext;
 
     Node mNode;
+    private OutputStream mOutputStream;
+
+    boolean channelCreated;
+
 
 
     public Communicator(Context context)
@@ -63,6 +72,8 @@ public class Communicator implements GoogleApiClient.ConnectionCallbacks, Google
                 {
                     mNode = getConnectedNodesResult.getNodes().get(0);
                     sendConnected();
+
+                    createChannel();
                 }
             }
         });
@@ -106,6 +117,52 @@ public class Communicator implements GoogleApiClient.ConnectionCallbacks, Google
                 }
             }
         });
+    }
+
+
+
+    private void createChannel()
+    {
+        Wearable.ChannelApi.openChannel(mGoogleApiClient, mNode.getId(), "data_channel").setResultCallback(new ResultCallback<ChannelApi.OpenChannelResult>()
+        {
+            @Override
+            public void onResult(@NonNull ChannelApi.OpenChannelResult openChannelResult)
+            {
+                Channel channel = openChannelResult.getChannel();
+                channel.getOutputStream(mGoogleApiClient).setResultCallback(new ResultCallback<Channel.GetOutputStreamResult>()
+                {
+                    @Override
+                    public void onResult(@NonNull Channel.GetOutputStreamResult getOutputStreamResult)
+                    {
+                        mOutputStream = getOutputStreamResult.getOutputStream();
+                        Log.v("channel", "created");
+                        channelCreated=true;
+                    }
+                });
+            }
+        });
+    }
+
+    public void writeData(String command, byte[] data)
+    {
+        try
+        {
+            if (mOutputStream!=null)
+            {
+                mOutputStream.write(data);
+                //Log.v("data","wear sent");
+            }
+        }
+        catch (IOException e)
+        {
+            //e.printStackTrace();
+        }
+    }
+
+
+    public boolean isChannelCreated()
+    {
+        return channelCreated;
     }
 
 

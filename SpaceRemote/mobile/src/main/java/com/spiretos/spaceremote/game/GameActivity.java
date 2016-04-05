@@ -1,7 +1,11 @@
 package com.spiretos.spaceremote.game;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -80,9 +84,10 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         mReceiver = new GameDataReceiver();
         mReceiver.setGameDataListener(this);
 
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(AppListenerService.RECEIVED_Y_DATA);
-        registerReceiver(mReceiver, intentFilter);
+        //IntentFilter intentFilter = new IntentFilter();
+        //intentFilter.addAction(AppListenerService.RECEIVED_Y_DATA);
+        //registerReceiver(mReceiver, intentFilter);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(AppListenerService.RECEIVED_Y_DATA));
     }
 
     @Override
@@ -118,5 +123,15 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         if (mGameEngine != null)
             mGameEngine.setShipPosition(yValue);
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            float yValue= intent.getFloatExtra("data_y", 0);
+            onYchanged(yValue);
+        }
+    };
 
 }

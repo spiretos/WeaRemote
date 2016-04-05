@@ -28,6 +28,7 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Log.v("asd","Asd");
         setContentView(R.layout.activity_space_remote);
         setAmbientEnabled();
 
@@ -99,7 +100,7 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
     }
 
     @Override
-    public void onSensorChanged(SensorEvent sensorEvent)
+    public void onSensorChanged(final SensorEvent sensorEvent)
     {
         if (mSensorText != null)
         {
@@ -110,8 +111,11 @@ public class SpaceRemoteActivity extends WearableActivity implements SensorEvent
 
             mSensorText.setText(sb.toString());
 
-            if (mCommunicator != null)
-                mCommunicator.sendMessage("gyroscope_data_y", DataUtils.getByteArray(String.valueOf(sensorEvent.values[1])));
+            if (mCommunicator != null && mCommunicator.isChannelCreated())
+            {
+                //mCommunicator.sendMessage("gyroscope_data_y", DataUtils.getByteArray(String.valueOf(sensorEvent.values[1])));
+                mCommunicator.writeData("gyroscope_data_y1", DataUtils.getByteArray(String.valueOf(sensorEvent.values[1])+"!"));
+            }
         }
     }
 
