@@ -16,7 +16,7 @@ public class Obstacle
     boolean active;
 
     long creationTime;
-    float speed = 300;
+    float speed;
 
     float size;
 
@@ -28,6 +28,7 @@ public class Obstacle
         active = true;
         position = new Random().nextInt(spaceWidth - 2 * margin) + margin;
         size = new Random().nextFloat() * 50f + 50f;
+        speed = new Random().nextFloat() * 250f + 250f;
     }
 
 

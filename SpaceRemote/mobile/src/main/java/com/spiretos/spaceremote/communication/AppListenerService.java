@@ -2,6 +2,7 @@ package com.spiretos.spaceremote.communication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -78,44 +79,55 @@ public class AppListenerService extends WearableListenerService implements Googl
                 @Override
                 public void onResult(@NonNull Channel.GetInputStreamResult getInputStreamResult)
                 {
-                    try
-                    {
-                        InputStream inputStream = getInputStreamResult.getInputStream();
-                        int i;
-                        char c;
-                        String s = "";
-                        while ((i = inputStream.read()) != -1)
-                        {
-                            c = (char) i;
-
-                            if (c == '!')
-                            {
-                                final float yValue = DataUtils.getFloatFrom(s);
-                                Log.v("data", yValue + "");
-
-                                new Runnable()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        Intent intent = new Intent(RECEIVED_Y_DATA);
-                                        intent.putExtra("data_y", yValue);
-                                        LocalBroadcastManager.getInstance(AppListenerService.this).sendBroadcast(intent);
-                                    }
-                                }.run();
-
-                                s = "";
-                            }
-                            else
-                                s += c;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ex.printStackTrace();
-                    }
+                    Thread t = new Thread(new TestThread(getInputStreamResult));
+                    t.start();
                 }
             });
+        }
+    }
+
+    public class TestThread implements Runnable
+    {
+
+        private final Channel.GetInputStreamResult getInputStreamResult;
+
+        public TestThread(Channel.GetInputStreamResult getInputStreamResult)
+        {
+            this.getInputStreamResult = getInputStreamResult;
+        }
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                InputStream inputStream = getInputStreamResult.getInputStream();
+                int i;
+                char c;
+                String s = "";
+                while ((i = inputStream.read()) != -1)
+                {
+                    c = (char) i;
+
+                    if (c == '!')
+                    {
+                        final float yValue = DataUtils.getFloatFrom(s);
+
+                        Intent intent = new Intent(RECEIVED_Y_DATA);
+                        intent.putExtra("data_y", yValue);
+                        LocalBroadcastManager.getInstance(AppListenerService.this).sendBroadcast(intent);
+
+                        Thread.sleep(5);
+                        s = "";
+                    }
+                    else
+                        s += c;
+                }
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
         }
     }
 

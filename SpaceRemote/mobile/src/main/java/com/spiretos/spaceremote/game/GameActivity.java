@@ -96,7 +96,7 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         if (mReceiver != null)
         {
             mReceiver.removeGameDataListener(this);
-            unregisterReceiver(mReceiver);
+            //unregisterReceiver(mReceiver);
         }
 
         if (mGameLoop != null)
@@ -117,8 +117,8 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
     {
         //Log.v("data2", yValue + "");
 
-        if (mDataText != null)
-            mDataText.setText(String.valueOf(yValue));
+        /*if (mDataText != null)
+            mDataText.setText(String.valueOf(yValue));*/
 
         if (mGameEngine != null)
             mGameEngine.setShipPosition(yValue);

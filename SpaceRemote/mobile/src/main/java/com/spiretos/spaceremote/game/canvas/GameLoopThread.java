@@ -50,7 +50,7 @@ public class GameLoopThread extends Thread
 
             try
             {
-                Thread.sleep(5);
+                Thread.sleep(10);
             }
             catch (InterruptedException ex)
             {
