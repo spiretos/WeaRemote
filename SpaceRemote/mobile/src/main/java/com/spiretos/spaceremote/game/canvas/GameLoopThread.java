@@ -37,7 +37,8 @@ public class GameLoopThread extends Thread
         {
             Canvas canvas = mHolder.lockCanvas(null);
 
-            mEngine.update(canvas);
+            if (canvas != null)
+                mEngine.update(canvas);
 
             if (canvas != null)
             {

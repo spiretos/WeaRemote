@@ -89,7 +89,7 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
             obstacle = mObstacles.get(i);
             if (obstacle.isActive())
             {
-                obstacleDistance=obstacle.getDistance();
+                obstacleDistance = obstacle.getDistance();
 
                 //canvas.drawCircle(obstacle.getPosition(), obstacle.getDistance(), obstacle.getSize(), shipPaint);
                 canvas.drawBitmap(asteroidImage, asteroidRect, obstacle.getRect(obstacleDistance), backPaint);
@@ -100,10 +100,10 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
 
         float x = canvas.getWidth() / 2f + shipPosition * 1000f;
         //canvas.drawCircle(x, canvas.getHeight() - 50f, 10f, shipPaint);
-        float shipSize=40f;
+        float shipSize = 40f;
         canvas.drawBitmap(shipImage, asteroidRect,
-                new RectF((float) x - shipSize / 2f,canvas.getHeight() - 50f -shipSize/2f,
-                        (float) x + shipSize / 2f,canvas.getHeight() - 50f +shipSize/2f)
+                new RectF((float) x - shipSize / 2f, canvas.getHeight() - 50f - shipSize / 2f,
+                        (float) x + shipSize / 2f, canvas.getHeight() - 50f + shipSize / 2f)
                 , backPaint);
     }
 

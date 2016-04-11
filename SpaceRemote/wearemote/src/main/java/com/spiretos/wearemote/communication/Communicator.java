@@ -28,6 +28,15 @@ import java.util.List;
 public class Communicator implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 {
 
+    public static final int TYPE_MESSAGE_API = 0;
+    public static final int TYPE_CHANNEL_API = 1;
+
+    public static final String MESSAGE_START_ACTIVITY="MESSAGE_START_ACTIVITY";
+    public static final String MESSAGE_FINISH_ACTIVITY="MESSAGE_FINISH_ACTIVITY";
+
+    public static final String BROADCAST_SENSOR_ACTIVITY_COMMAND="com.spiretos.wearemote.SENSOR_ACTIVITY_COMMAND";
+
+
     GoogleApiClient mGoogleApiClient;
     Context mContext;
 
@@ -73,7 +82,7 @@ public class Communicator implements GoogleApiClient.ConnectionCallbacks, Google
                     mNode = getConnectedNodesResult.getNodes().get(0);
                     sendConnected();
 
-                    createChannel();
+                    //createChannel();
                 }
             }
         });
@@ -102,19 +111,15 @@ public class Communicator implements GoogleApiClient.ConnectionCallbacks, Google
         if (mNode == null)
             return;
 
-        //Log.v("app", "sendMessage");
-
         Wearable.MessageApi.sendMessage(mGoogleApiClient, mNode.getId(), command, data).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>()
         {
             @Override
             public void onResult(MessageApi.SendMessageResult sendMessageResult)
             {
-                //Log.v("app", "onResult");
-
-                if (!sendMessageResult.getStatus().isSuccess())
+                /*if (!sendMessageResult.getStatus().isSuccess())
                 {
-                    //Log.e("GoogleApi", "Failed to send message with status code: " + sendMessageResult.getStatus().getStatusCode());
-                }
+
+                }*/
             }
         });
     }

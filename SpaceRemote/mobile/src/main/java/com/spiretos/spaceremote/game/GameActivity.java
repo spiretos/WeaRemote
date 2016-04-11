@@ -1,25 +1,17 @@
 package com.spiretos.spaceremote.game;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
 import com.spiretos.spaceremote.R;
-import com.spiretos.spaceremote.communication.AppListenerService;
 import com.spiretos.spaceremote.communication.GameDataReceiver;
 import com.spiretos.spaceremote.game.canvas.BasicSurfaceCallback;
 import com.spiretos.spaceremote.game.canvas.GameLoopThread;
-import com.spiretos.wearemote.communication.Communicator;
+import com.spiretos.wearemote.receiver.ReceiverActivity;
 
-public class GameActivity extends AppCompatActivity implements GameDataReceiver.GameDataListener
+public class GameActivity extends ReceiverActivity implements GameDataReceiver.GameDataListener
 {
 
     public static final String START_ACTIVITY_PATH = "/start/MainActivity";
@@ -30,7 +22,6 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
 
     TextView mDataText;
 
-    Communicator mCommunicator;
     GameDataReceiver mReceiver;
     SurfaceView mSurface;
     SpaceRemoteGameEngine mGameEngine;
@@ -47,18 +38,8 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
         setupGame();
 
         mDataText = (TextView) findViewById(R.id.game_datatext);
-
-        mCommunicator = new Communicator(this);
-        mCommunicator.setCommunicationListener(new Communicator.CommunicationListener()
-        {
-            @Override
-            public void onConnected()
-            {
-                mCommunicator.sendMessage(START_ACTIVITY_PATH);
-            }
-        });
-        mCommunicator.connect();
     }
+
 
     private void setupGame()
     {
@@ -76,40 +57,7 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
     }
 
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
 
-        mReceiver = new GameDataReceiver();
-        mReceiver.setGameDataListener(this);
-
-        //IntentFilter intentFilter = new IntentFilter();
-        //intentFilter.addAction(AppListenerService.RECEIVED_Y_DATA);
-        //registerReceiver(mReceiver, intentFilter);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(AppListenerService.RECEIVED_Y_DATA));
-    }
-
-    @Override
-    protected void onPause()
-    {
-        if (mReceiver != null)
-        {
-            mReceiver.removeGameDataListener(this);
-            //unregisterReceiver(mReceiver);
-        }
-
-        if (mGameLoop != null)
-            mGameLoop.setRunning(false);
-
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop()
-    {
-        super.onStop();
-    }
 
 
     @Override
@@ -124,14 +72,13 @@ public class GameActivity extends AppCompatActivity implements GameDataReceiver.
             mGameEngine.setShipPosition(yValue);
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver()
+    @Override
+    protected void OnReceivedRemoteValue(String type, float value)
     {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            float yValue= intent.getFloatExtra("data_y", 0);
-            onYchanged(yValue);
-        }
-    };
+        if (mGameEngine != null)
+            mGameEngine.setShipPosition(value);
+    }
+
+
 
 }

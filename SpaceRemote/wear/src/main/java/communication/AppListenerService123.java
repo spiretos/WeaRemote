@@ -10,7 +10,7 @@ import com.spiretos.spaceremote.SpaceRemoteActivity;
 /**
  * Created by spiretos on 26/3/2016.
  */
-public class AppListenerService extends WearableListenerService
+public class AppListenerService123 extends WearableListenerService
 {
 
     public static final String START_ACTIVITY_PATH = "/start/MainActivity";

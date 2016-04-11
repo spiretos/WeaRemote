@@ -1,8 +1,7 @@
-package com.spiretos.spaceremote.communication;
+package com.spiretos.wearemote.communication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -10,7 +9,6 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Channel;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Wearable;
@@ -37,18 +35,39 @@ public class AppListenerService extends WearableListenerService implements Googl
     {
         super.onMessageReceived(messageEvent);
 
-        if (messageEvent.getPath().equals("gyroscope_data_y"))
-        {
-            float yValue = DataUtils.getFloatFrom(DataUtils.getStringFrom(messageEvent.getData()));
-            Log.v("data123", yValue + "");
+        //Log.w("m-", "message received");
 
-            /*Intent intent = new Intent();
-            intent.setAction(RECEIVED_Y_DATA);
-            intent.putExtra("data_y", yValue);
-            sendBroadcast(intent);*/
-            Intent intent = new Intent(RECEIVED_Y_DATA);
-            intent.putExtra("data_y", yValue);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        if (messageEvent.getPath().equals(Communicator.MESSAGE_START_ACTIVITY))
+        {
+            Log.w("received", Communicator.MESSAGE_START_ACTIVITY);
+            Intent intent = new Intent(Communicator.BROADCAST_SENSOR_ACTIVITY_COMMAND);
+            intent.putExtra("command",Communicator.MESSAGE_START_ACTIVITY);
+            sendBroadcast(intent);
+        }
+        if (messageEvent.getPath().equals(Communicator.MESSAGE_FINISH_ACTIVITY))
+        {
+            Log.w("received", Communicator.MESSAGE_FINISH_ACTIVITY);
+            Intent intent = new Intent(Communicator.BROADCAST_SENSOR_ACTIVITY_COMMAND);
+            intent.putExtra("command",Communicator.MESSAGE_FINISH_ACTIVITY);
+            sendBroadcast(intent);
+        }
+        else
+        {
+            try
+            {
+                float sensorValue = DataUtils.getFloatFrom(DataUtils.getStringFrom(messageEvent.getData()));
+
+                //Log.w("m-", "got '" + messageEvent.getPath() + "'=" + sensorValue);
+
+                Intent intent = new Intent("sensor_data");
+                intent.putExtra("type",messageEvent.getPath());
+                intent.putExtra("value", sensorValue);
+                LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -72,7 +91,7 @@ public class AppListenerService extends WearableListenerService implements Googl
     @Override
     public void onConnected(@Nullable Bundle bundle)
     {
-        if (mDataChannel != null)
+        /*if (mDataChannel != null)
         {
             mDataChannel.getInputStream(mGoogleApiClient).setResultCallback(new ResultCallback<Channel.GetInputStreamResult>()
             {
@@ -83,7 +102,7 @@ public class AppListenerService extends WearableListenerService implements Googl
                     t.start();
                 }
             });
-        }
+        }*/
     }
 
     public class TestThread implements Runnable
