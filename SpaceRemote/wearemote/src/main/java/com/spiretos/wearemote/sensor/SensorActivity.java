@@ -28,6 +28,9 @@ public abstract class SensorActivity extends WearableActivity implements SensorE
     private int mCommunicationType = Communicator.TYPE_MESSAGE_API;
 
 
+    WearSensor tempSensor;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -96,11 +99,11 @@ public abstract class SensorActivity extends WearableActivity implements SensorE
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-        WearSensor sensor = getSensor(event);
-        onNewSensorData(sensor, event);
+        tempSensor = getSensor(event);
+        onGotSensorData(tempSensor, event);
     }
 
-    protected abstract void onNewSensorData(WearSensor sensor, SensorEvent event);
+    protected abstract void onGotSensorData(WearSensor sensor, SensorEvent event);
 
     private WearSensor getSensor(SensorEvent event)
     {

@@ -22,10 +22,10 @@ public class SpaceRemoteCommandsReceiver extends WearCommandsReceiver
         {
             startActivity(context);
         }
-        else if (message.equals(Communicator.MESSAGE_START_ACTIVITY))
+        /*else if (message.equals(Communicator.MESSAGE_FINISH_ACTIVITY))
         {
-            //local broadcast to kill?
-        }
+            //local broadcast to finish activity?
+        }*/
     }
 
     private void startActivity(Context context)

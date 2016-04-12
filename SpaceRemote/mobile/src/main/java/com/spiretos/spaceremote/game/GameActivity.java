@@ -1,6 +1,7 @@
 package com.spiretos.spaceremote.game;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
@@ -11,18 +12,14 @@ import com.spiretos.spaceremote.game.canvas.BasicSurfaceCallback;
 import com.spiretos.spaceremote.game.canvas.GameLoopThread;
 import com.spiretos.wearemote.receiver.ReceiverActivity;
 
-public class GameActivity extends ReceiverActivity implements GameDataReceiver.GameDataListener
+public class GameActivity extends ReceiverActivity
 {
 
-    public static final String START_ACTIVITY_PATH = "/start/MainActivity";
-
     public static final String GAME_SPACE = "game_space";
-    public static final String GAME_GHOSTS = "game_ghosts";
 
 
     TextView mDataText;
 
-    GameDataReceiver mReceiver;
     SurfaceView mSurface;
     SpaceRemoteGameEngine mGameEngine;
     GameLoopThread mGameLoop;
@@ -34,7 +31,6 @@ public class GameActivity extends ReceiverActivity implements GameDataReceiver.G
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        //Log.v("app", "create");
         setupGame();
 
         mDataText = (TextView) findViewById(R.id.game_datatext);
@@ -57,28 +53,31 @@ public class GameActivity extends ReceiverActivity implements GameDataReceiver.G
     }
 
 
-
-
-
-    @Override
-    public void onYchanged(float yValue)
-    {
-        //Log.v("data2", yValue + "");
-
-        /*if (mDataText != null)
-            mDataText.setText(String.valueOf(yValue));*/
-
-        if (mGameEngine != null)
-            mGameEngine.setShipPosition(yValue);
-    }
-
     @Override
     protected void OnReceivedRemoteValue(String type, float value)
     {
         if (mGameEngine != null)
-            mGameEngine.setShipPosition(value);
+        {
+            mGameEngine.setShipSpeed(value);
+        }
     }
 
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
 
+        if (mGameLoop != null)
+            mGameLoop.setRunning(true);
+    }
+
+    @Override
+    protected void onPause()
+    {
+        if (mGameLoop != null)
+            mGameLoop.setRunning(false);
+
+        super.onPause();
+    }
 }

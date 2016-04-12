@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import com.spiretos.spaceremote.R;
 import com.spiretos.spaceremote.game.canvas.BasicGameEngine;
 import com.spiretos.spaceremote.game.items.Obstacle;
+import com.spiretos.spaceremote.game.items.SpaceShip;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 public class SpaceRemoteGameEngine implements BasicGameEngine
 {
 
-    private float shipPosition;
+    private SpaceShip mShip;
 
     Paint backPaint;
     Paint shipPaint;
@@ -51,6 +52,8 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
 
         mObstacles = new ArrayList<>();
 
+        mShip = new SpaceShip();
+
         shipImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.ship);
         shipRect = new Rect(0, 0, shipImage.getWidth(), shipImage.getHeight());
         asteroidImage = BitmapFactory.decodeResource(context.getResources(), R.drawable.asteroid);
@@ -63,6 +66,9 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
     public void update(Canvas canvas)
     {
         long currentTime = System.currentTimeMillis();
+
+        mShip.setAvailableSpace(canvas.getWidth());
+        mShip.calculatePosition();
 
         for (int i = mObstacles.size() - 1; i >= 0; i--)
         {
@@ -98,18 +104,20 @@ public class SpaceRemoteGameEngine implements BasicGameEngine
             }
         }
 
-        float x = canvas.getWidth() / 2f + shipPosition * 1000f;
+        //float x = canvas.getWidth() / 2f + mShip.getPosition() * 1000f;
+        float x = mShip.getPosition();
+
         //canvas.drawCircle(x, canvas.getHeight() - 50f, 10f, shipPaint);
-        float shipSize = 40f;
+        float shipSize = 60f;
         canvas.drawBitmap(shipImage, asteroidRect,
                 new RectF((float) x - shipSize / 2f, canvas.getHeight() - 50f - shipSize / 2f,
                         (float) x + shipSize / 2f, canvas.getHeight() - 50f + shipSize / 2f)
                 , backPaint);
     }
 
-    public void setShipPosition(float y)
+    public void setShipSpeed(float y)
     {
-        this.shipPosition = y;
+        mShip.setSpeed(y * 130f);
     }
 
 }
