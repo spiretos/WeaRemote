@@ -1,15 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         applicationId "com.spiretos.spaceremote"
-        minSdkVersion 19
-        targetSdkVersion 23
+        minSdkVersion 25
+        targetSdkVersion 28
         versionCode 2
         versionName "1.0"
+
+        wearAppUnbundled true
     }
     buildTypes {
         release {
@@ -20,13 +22,13 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    wearApp project(':wear')
-    testCompile 'junit:junit:4.12'
-    compile project(path: ':wearemote')
-    compile 'com.android.support:appcompat-v7:23.1.1'
-    compile 'com.google.android.gms:play-services:8.4.0'
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
-    compile 'com.google.android.gms:play-services-auth:8.4.0'
-    compile 'com.google.android.gms:play-services-gcm:8.4.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //wearApp project(':wear')
+    testImplementation 'junit:junit:4.12'
+    implementation project(path: ':wearemote')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'com.google.android.gms:play-services-ads:18.2.0'
+    implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    //implementation 'com.google.android.gms:play-services-gcm:8.4.0'
 }
